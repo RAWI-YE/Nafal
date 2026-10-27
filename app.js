@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { 
-  getFirestore, collection, doc, addDoc, updateDoc, onSnapshot, query, orderBy, where, getDocs 
+  getFirestore, collection, doc, addDoc, updateDoc, onSnapshot, query, orderBy 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // 1. إعدادات قاعدة بيانات فايربيس الخاصة بك
@@ -17,10 +17,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// متغيرات النظام
+// متغيرات النظام الافتراضية
 let storeConfig = {
   storeName: "NAFAL Specialty Roast",
-  bannerText: "المتجر يوصل لداخل شرورة فقط 🚚",
+  bannerText: "المتجر يوصل لداخل شرورة فقط",
   promoMessage: "اطلب بـ 100 ريال والتوصيل بـ 5 ريال! وعند الطلب بـ 300 ريال التوصيل مجاني!",
   baseDeliveryFee: 15,
   enableSmartOffers: true,
@@ -39,10 +39,11 @@ let selectedCategory = "all";
 let cart = JSON.parse(localStorage.getItem("nafal_cart") || "[]");
 let savedInvoices = JSON.parse(localStorage.getItem("nafal_my_invoices") || "[]");
 
-// إشعار منبثق
+// إشعار عائم زجاجي
 function showToast(msg) {
   const toast = document.getElementById("toast");
-  toast.textContent = msg;
+  const toastText = document.getElementById("toastText");
+  toastText.textContent = msg;
   toast.classList.remove("hidden");
   setTimeout(() => toast.classList.add("hidden"), 2800);
 }
@@ -60,10 +61,9 @@ function listenToStoreSettings() {
 }
 
 function applyStoreSettingsToUI() {
-  document.getElementById("topBanner").textContent = storeConfig.bannerText || "المتجر يوصل لداخل شرورة فقط 🚚";
+  document.getElementById("topBanner").textContent = storeConfig.bannerText || "المتجر يوصل لداخل شرورة فقط";
   document.getElementById("promoText").textContent = storeConfig.promoMessage || "";
 
-  // تحديث روابط التواصل الاجتماعي
   const snapBtn = document.getElementById("snapchatLink");
   const tiktokBtn = document.getElementById("tiktokLink");
   const waBtn = document.getElementById("whatsappFooterLink");
@@ -89,16 +89,21 @@ function applyStoreSettingsToUI() {
   }
 }
 
-// 3. عرض الأقسام والمنتجات مباشرة
+// 3. عرض الأقسام والمنتجات بأيقونات احترافية
 function renderCategoriesBar() {
   const bar = document.getElementById("categoriesBar");
-  bar.innerHTML = `<button class="cat-pill ${selectedCategory === 'all' ? 'active' : ''}" data-cat="all">كل المحاصيل والمنتجات</button>`;
+  bar.innerHTML = `
+    <button class="cat-pill ${selectedCategory === 'all' ? 'active' : ''}" data-cat="all">
+      <i class="ri-apps-2-line"></i>
+      <span>كل المحاصيل والمنتجات</span>
+    </button>
+  `;
 
   (storeConfig.categories || []).forEach(cat => {
     const btn = document.createElement("button");
     btn.className = `cat-pill ${selectedCategory === cat ? "active" : ""}`;
     btn.dataset.cat = cat;
-    btn.textContent = cat;
+    btn.innerHTML = `<i class="ri-cup-line"></i><span>${cat}</span>`;
     bar.appendChild(btn);
   });
 
@@ -131,7 +136,12 @@ function renderProductsGrid() {
     : allProducts.filter(p => p.category === selectedCategory);
 
   if (filtered.length === 0) {
-    grid.innerHTML = `<div class="loading-box">لا توجد منتجات في هذا القسم حالياً ☕</div>`;
+    grid.innerHTML = `
+      <div class="loading-box glass-panel">
+        <i class="ri-cup-line"></i>
+        <span>لا توجد محاصيل أو منتجات في هذا القسم حالياً</span>
+      </div>
+    `;
     return;
   }
 
@@ -143,16 +153,17 @@ function renderProductsGrid() {
     card.innerHTML = `
       <div class="product-img-wrap">
         <img src="${prod.imageUrl}" alt="${prod.name}">
-        ${prod.freeDelivery ? `<span class="badge-free-delivery">🚚 توصيل مجاني</span>` : ""}
+        ${prod.freeDelivery ? `<span class="badge-free-delivery"><i class="ri-truck-line"></i> توصيل مجاني</span>` : ""}
         <span class="badge-category">${prod.category}</span>
       </div>
       <div class="product-info">
         <h3 class="product-title">${prod.name}</h3>
         <p class="product-desc">${prod.description || "محصول قهوة مختصة فاخر من نفال"}</p>
         <div class="product-footer">
-          <span class="product-price">${prod.price} ريال</span>
+          <span class="product-price">${prod.price} <small>ريال</small></span>
           <button class="btn-add" ${outOfStock ? "disabled" : ""}>
-            ${outOfStock ? "نفذت الكمية" : "+ أضف للسلة"}
+            <i class="${outOfStock ? 'ri-forbid-2-line' : 'ri-add-line'}"></i>
+            <span>${outOfStock ? "نفذت الكمية" : "أضف للسلة"}</span>
           </button>
         </div>
       </div>
@@ -173,7 +184,7 @@ function addToCart(product) {
     if (existing.qty < product.stock) {
       existing.qty += 1;
     } else {
-      showToast("عذراً، وصلت للحد الأقصى المتوفر في المخزون");
+      showToast("وصلت للحد الأقصى المتوفر في المخزون");
       return;
     }
   } else {
@@ -188,7 +199,7 @@ function addToCart(product) {
   }
   saveCart();
   updateCartUI();
-  showToast(`تمت إضافة "${product.name}" للسلة ☕`);
+  showToast(`تمت إضافة "${product.name}" للسلة`);
 }
 
 function saveCart() {
@@ -198,17 +209,16 @@ function saveCart() {
 function calculateTotals() {
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   if (cart.length === 0) {
-    return { subtotal: 0, deliveryFee: 0, total: 0, hint: "سلتك فارغة حالياً، أضف محاصيلك المفضلة ☕" };
+    return { subtotal: 0, deliveryFee: 0, total: 0, hint: "سلتك فارغة حالياً، أضف محاصيلك المفضلة" };
   }
 
-  // إذا كل المنتجات في السلة معفية من التوصيل
   const allItemsFreeDelivery = cart.every(item => item.freeDelivery === true);
   if (allItemsFreeDelivery) {
     return { 
       subtotal, 
       deliveryFee: 0, 
       total: subtotal, 
-      hint: "🎉 منتجاتك المختارة تشمل توصيل مجاني داخل شرورة!" 
+      hint: "منتجاتك المختارة تشمل توصيل مجاني داخل شرورة" 
     };
   }
 
@@ -224,15 +234,15 @@ function calculateTotals() {
     if (subtotal >= t2) {
       deliveryFee = f2;
       hint = f2 === 0 
-        ? `🎉 مبروك! فاتورتك تجاوزت ${t2} ريال وحصلت على توصيل مجاني!` 
-        : `🎉 مبروك! حصلت على عرض التوصيل المخفض (${f2} ريال فقط)`;
+        ? `مبروك! فاتورتك تجاوزت ${t2} ريال وحصلت على توصيل مجاني` 
+        : `مبروك! حصلت على عرض التوصيل المخفض (${f2} ريال فقط)`;
     } else if (subtotal >= t1) {
       deliveryFee = f1;
       const remainingForT2 = t2 - subtotal;
-      hint = `✨ التوصيل الآن بـ ${f1} ريال فقط! أضف منتجات بـ ${remainingForT2} ريال ليصبح التوصيل ${f2 === 0 ? "مجاني" : f2 + " ريال"}!`;
+      hint = `التوصيل الآن بـ ${f1} ريال فقط! أضف بـ ${remainingForT2} ريال ليصبح التوصيل ${f2 === 0 ? "مجاني" : f2 + " ريال"}`;
     } else {
       const remainingForT1 = t1 - subtotal;
-      hint = `💡 أضف منتجات بقيمة ${remainingForT1} ريال ليصبح التوصيل بـ ${f1} ريال فقط بدلاً من ${deliveryFee} ريال!`;
+      hint = `أضف منتجات بقيمة ${remainingForT1} ريال ليصبح التوصيل بـ ${f1} ريال فقط بدلاً من ${deliveryFee} ريال`;
     }
   }
 
@@ -260,9 +270,9 @@ function updateCartUI() {
         <span>${item.price} ريال × ${item.qty} = ${item.price * item.qty} ريال</span>
       </div>
       <div class="qty-controls">
-        <button type="button" class="qty-btn dec-btn">-</button>
+        <button type="button" class="qty-btn dec-btn"><i class="ri-subtract-line"></i></button>
         <strong>${item.qty}</strong>
-        <button type="button" class="qty-btn inc-btn">+</button>
+        <button type="button" class="qty-btn inc-btn"><i class="ri-add-line"></i></button>
       </div>
     `;
 
@@ -302,11 +312,11 @@ document.getElementById("getGpsBtn").addEventListener("click", () => {
   const gpsInput = document.getElementById("custGpsUrl");
 
   if (!navigator.geolocation) {
-    statusText.textContent = "❌ متصفحك لا يدعم تحديد الموقع، يرجى كتابة العنوان بالأسفل.";
+    statusText.textContent = "متصفحك لا يدعم تحديد الموقع، يرجى كتابة العنوان بالأسفل.";
     return;
   }
 
-  statusText.textContent = "⏳ جاري التقاط موقعك الجغرافي بالـ GPS...";
+  statusText.textContent = "جاري التقاط موقعك الجغرافي بالـ GPS...";
 
   navigator.geolocation.getCurrentPosition(
     (position) => {
@@ -314,10 +324,10 @@ document.getElementById("getGpsBtn").addEventListener("click", () => {
       const lng = position.coords.longitude;
       const mapsUrl = `https://maps.google.com/?q=${lat},${lng}`;
       gpsInput.value = mapsUrl;
-      statusText.textContent = "✅ تم تحديد موقعك الجغرافي بنجاح!";
+      statusText.textContent = "تم تحديد موقعك الجغرافي بنجاح";
     },
     () => {
-      statusText.textContent = "⚠️ تعذر التقاط الـ GPS، تأكد من تفعيل الموقع في جوالك أو اكتب حيّك بالأسفل.";
+      statusText.textContent = "تعذر التقاط الـ GPS، تأكد من تفعيل الموقع أو اكتب حيّك بالأسفل.";
       gpsInput.removeAttribute("readonly");
       gpsInput.placeholder = "اكتب اسم الحي والشارع هنا";
     },
@@ -340,7 +350,7 @@ document.getElementById("checkoutForm").addEventListener("submit", async (e) => 
 
   const submitBtn = document.getElementById("submitOrderBtn");
   submitBtn.disabled = true;
-  submitBtn.textContent = "⏳ جاري إصدار الفاتورة...";
+  submitBtn.innerHTML = `<i class="ri-loader-4-line spin-icon"></i><span>جاري إصدار الفاتورة...</span>`;
 
   const invoiceNumber = generateInvoiceNumber();
   const totals = calculateTotals();
@@ -361,10 +371,8 @@ document.getElementById("checkoutForm").addEventListener("submit", async (e) => 
   };
 
   try {
-    // حفظ الفاتورة في قاعدة البيانات لتظهر في غرفة العمليات فوراً
     await addDoc(collection(db, "nafal_orders"), orderData);
 
-    // خصم الكميات من المخزون
     for (const item of cart) {
       const prod = allProducts.find(p => p.id === item.id);
       if (prod) {
@@ -373,42 +381,37 @@ document.getElementById("checkoutForm").addEventListener("submit", async (e) => 
       }
     }
 
-    // حفظ رقم الفاتورة في جهاز العميل لمتابعتها
     if (!savedInvoices.includes(invoiceNumber)) {
       savedInvoices.unshift(invoiceNumber);
       localStorage.setItem("nafal_my_invoices", JSON.stringify(savedInvoices));
     }
 
-    // تجهيز رسالة واتساب المختصرة والمرتبة وحقنها
     const storeWa = (storeConfig.whatsappNumber || "").replace(/[^0-9]/g, "");
     const itemsSummary = orderData.items.map(i => `• ${i.name} (${i.qty})`).join("\n");
 
     const waText = encodeURIComponent(
-      `*طلب جديد - متجر نفال للقهوة المختصة* ☕\n` +
-      `🧾 *رقم الفاتورة:* #${invoiceNumber}\n` +
-      `👤 *العميل:* ${orderData.customerName}\n` +
-      `📱 *الجوال:* ${orderData.customerPhone}\n` +
-      `📍 *الموقع (GPS):* ${orderData.gpsLocation}\n` +
-      `🏠 *العنوان:* ${orderData.customerAddress}\n` +
+      `*طلب جديد - متجر نفال للقهوة المختصة*\n` +
+      `*رقم الفاتورة:* #${invoiceNumber}\n` +
+      `*العميل:* ${orderData.customerName}\n` +
+      `*الجوال:* ${orderData.customerPhone}\n` +
+      `*الموقع (GPS):* ${orderData.gpsLocation}\n` +
+      `*العنوان:* ${orderData.customerAddress}\n` +
       `------------------\n` +
-      `📦 *الطلبات:*\n${itemsSummary}\n` +
+      `*الطلبات:*\n${itemsSummary}\n` +
       `------------------\n` +
-      `🚚 *التوصيل:* ${orderData.deliveryFee} ريال\n` +
-      `💰 *الإجمالي النهائي:* ${orderData.totalAmount} ريال`
+      `*التوصيل:* ${orderData.deliveryFee} ريال\n` +
+      `*الإجمالي النهائي:* ${orderData.totalAmount} ريال`
     );
 
-    // تفريغ السلة
     cart = [];
     saveCart();
     updateCartUI();
     document.getElementById("checkoutForm").reset();
     document.getElementById("cartModal").classList.add("hidden");
 
-    // فتح نافذة متابعة الفاتورة للعميل
     document.getElementById("ordersModal").classList.remove("hidden");
     listenToCustomerInvoices();
 
-    // تحويل العميل لمحادثة واتساب المتجر مباشرة
     window.open(`https://wa.me/${storeWa}?text=${waText}`, "_blank");
 
   } catch (err) {
@@ -416,11 +419,11 @@ document.getElementById("checkoutForm").addEventListener("submit", async (e) => 
     showToast("حدث خطأ أثناء إنشاء الفاتورة، حاول مرة أخرى");
   } finally {
     submitBtn.disabled = false;
-    submitBtn.textContent = "إنشاء الفاتورة وتأكيد الطلب عبر واتساب 💬";
+    submitBtn.innerHTML = `<i class="ri-whatsapp-line"></i><span>إنشاء الفاتورة وتأكيد الطلب عبر واتساب</span>`;
   }
 });
 
-// 7. نظام متابعة حالة الفواتير المباشر للعميل
+// 7. نظام متابعة حالة الفواتير المباشر للعميل بالأيقونات
 let unsubscribeInvoices = null;
 
 function listenToCustomerInvoices(searchInvoice = "") {
@@ -451,17 +454,21 @@ function listenToCustomerInvoices(searchInvoice = "") {
       return;
     }
 
-    matched.forEach(order => {
-      const steps = [
-        "جديد - قيد المراجعة",
-        "جاري التحميص والتجهيز",
-        "مع المندوب للتوصيل",
-        "تم التوصيل"
-      ];
-      const currentIdx = steps.indexOf(order.status);
+    const stepsMeta = [
+      { label: "جديد - قيد المراجعة", icon: "ri-time-line" },
+      { label: "جاري التحميص والتجهيز", icon: "ri-fire-line" },
+      { label: "مع المندوب للتوصيل", icon: "ri-e-bike-2-line" },
+      { label: "تم التوصيل", icon: "ri-checkbox-circle-line" }
+    ];
 
-      const stepsHtml = steps.map((st, idx) => `
-        <div class="step-box ${idx <= currentIdx ? "done" : ""}">${st}</div>
+    matched.forEach(order => {
+      const currentIdx = stepsMeta.findIndex(s => s.label === order.status);
+
+      const stepsHtml = stepsMeta.map((st, idx) => `
+        <div class="step-box ${idx <= currentIdx ? "done" : ""}">
+          <i class="${st.icon}"></i>
+          <span>${st.label}</span>
+        </div>
       `).join("");
 
       const itemsLine = (order.items || []).map(i => `${i.name} × ${i.qty}`).join(" ، ");
