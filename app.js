@@ -1,9 +1,9 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { 
-  getFirestore, collection, doc, addDoc, updateDoc, onSnapshot, query, orderBy 
+  initializeFirestore, getFirestore, collection, doc, addDoc, updateDoc, onSnapshot 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// 1. إعدادات قاعدة بيانات فايربيس الخاصة بك
+// 1. إعدادات قاعدة بيانات فايربيس مع تفعيل الاتصال المستقر
 const firebaseConfig = {
   apiKey: "AIzaSyAtCSiIDDN9nceKMj2xZbjREy9qXFEv68k",
   authDomain: "rawi-ye02.firebaseapp.com",
@@ -14,12 +14,26 @@ const firebaseConfig = {
   measurementId: "G-0RDKKNKSJJ"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+let app;
+let db;
+if (getApps().length === 0) {
+  app = initializeApp(firebaseConfig);
+  db = initializeFirestore(app, {
+    experimentalForceLongPolling: true,
+    ignoreUndefinedProperties: true
+  });
+} else {
+  app = getApps()[0];
+  db = getFirestore(app);
+}
 
-// متغيرات النظام الافتراضية
+const DEFAULT_COFFEE_IMG = "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=800&q=80";
+
+// إعدادات المتجر الافتراضية (تتحدث لحظياً من غرفة العمليات)
 let storeConfig = {
   storeName: "NAFAL Specialty Roast",
+  storeDescription: "نفال للقهوة المختصة والمحاصيل الفاخرة",
+  storeLogo: "",
   bannerText: "المتجر يوصل لداخل شرورة فقط",
   promoMessage: "اطلب بـ 100 ريال والتوصيل بـ 5 ريال! وعند الطلب بـ 300 ريال التوصيل مجاني!",
   baseDeliveryFee: 15,
@@ -31,6 +45,9 @@ let storeConfig = {
   whatsappNumber: "966500000000",
   snapchatUrl: "",
   tiktokUrl: "",
+  instagramUrl: "",
+  twitterUrl: "",
+  mapsUrl: "",
   categories: ["محاصيل مختصة", "أدوات قهوة", "بكجات نفال"]
 };
 
@@ -42,13 +59,12 @@ let savedInvoices = JSON.parse(localStorage.getItem("nafal_my_invoices") || "[]"
 // إشعار عائم زجاجي
 function showToast(msg) {
   const toast = document.getElementById("toast");
-  const toastText = document.getElementById("toastText");
-  toastText.textContent = msg;
+  document.getElementById("toastText").textContent = msg;
   toast.classList.remove("hidden");
   setTimeout(() => toast.classList.add("hidden"), 2800);
 }
 
-// 2. الاستماع المباشر لإعدادات المتجر والعروض من غرفة العمليات
+// 2. الاستماع المباشر للهوية، الشعار، العروض، وحسابات التواصل من غرفة العمليات
 function listenToStoreSettings() {
   onSnapshot(doc(db, "nafal_settings", "storeConfig"), (snap) => {
     if (snap.exists()) {
@@ -61,39 +77,70 @@ function listenToStoreSettings() {
 }
 
 function applyStoreSettingsToUI() {
+  // تحديث الاسم والوصف في الهيدر والفوتر وعنوان الصفحة
+  const name = storeConfig.storeName || "NAFAL Specialty Roast";
+  const desc = storeConfig.storeDescription || "نفال للقهوة المختصة والمحاصيل الفاخرة";
+  document.title = `${name} | ${desc}`;
+  document.getElementById("storeTitle").textContent = name;
+  document.getElementById("storeDesc").textContent = desc;
+  document.getElementById("footerStoreName").textContent = name;
+  document.getElementById("footerStoreDesc").textContent = `${desc} — التوصيل داخل شرورة فقط`;
+
+  // تحديث شعار المتجر (صورة أو أيقونة القهوة الافتراضية)
+  const logoImg = document.getElementById("storeLogoImg");
+  const logoIcon = document.getElementById("storeLogoIcon");
+  if (storeConfig.storeLogo) {
+    logoImg.src = storeConfig.storeLogo;
+    logoImg.classList.remove("hidden");
+    logoIcon.classList.add("hidden");
+  } else {
+    logoImg.classList.add("hidden");
+    logoIcon.classList.remove("hidden");
+  }
+
+  // تحديث شريط شرورة العلوي وشريط العروض
   document.getElementById("topBanner").textContent = storeConfig.bannerText || "المتجر يوصل لداخل شرورة فقط";
-  document.getElementById("promoText").textContent = storeConfig.promoMessage || "";
+  const promoSection = document.getElementById("promoSection");
+  if (storeConfig.promoMessage) {
+    document.getElementById("promoText").textContent = storeConfig.promoMessage;
+    promoSection.classList.remove("hidden");
+  } else {
+    promoSection.classList.add("hidden");
+  }
 
-  const snapBtn = document.getElementById("snapchatLink");
-  const tiktokBtn = document.getElementById("tiktokLink");
+  // تحديث جميع روابط مواقع التواصل الاجتماعي
+  toggleSocialLink("snapchatLink", storeConfig.snapchatUrl);
+  toggleSocialLink("tiktokLink", storeConfig.tiktokUrl);
+  toggleSocialLink("instagramLink", storeConfig.instagramUrl);
+  toggleSocialLink("twitterLink", storeConfig.twitterUrl);
+  toggleSocialLink("mapsLink", storeConfig.mapsUrl);
+
   const waBtn = document.getElementById("whatsappFooterLink");
-
-  if (storeConfig.snapchatUrl) {
-    snapBtn.href = storeConfig.snapchatUrl;
-    snapBtn.classList.remove("hidden");
-  } else {
-    snapBtn.classList.add("hidden");
-  }
-
-  if (storeConfig.tiktokUrl) {
-    tiktokBtn.href = storeConfig.tiktokUrl;
-    tiktokBtn.classList.remove("hidden");
-  } else {
-    tiktokBtn.classList.add("hidden");
-  }
-
   if (storeConfig.whatsappNumber) {
     const cleanPhone = storeConfig.whatsappNumber.replace(/[^0-9]/g, "");
     waBtn.href = `https://wa.me/${cleanPhone}`;
     waBtn.classList.remove("hidden");
+  } else {
+    waBtn.classList.add("hidden");
   }
 }
 
-// 3. عرض الأقسام والمنتجات بأيقونات احترافية
+function toggleSocialLink(elementId, url) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  if (url && url.trim() !== "") {
+    el.href = url.trim();
+    el.classList.remove("hidden");
+  } else {
+    el.classList.add("hidden");
+  }
+}
+
+// 3. عرض الأقسام والمنتجات بشكل شبكي متناسق
 function renderCategoriesBar() {
   const bar = document.getElementById("categoriesBar");
   bar.innerHTML = `
-    <button class="cat-pill ${selectedCategory === 'all' ? 'active' : ''}" data-cat="all">
+    <button type="button" class="cat-pill ${selectedCategory === 'all' ? 'active' : ''}" data-cat="all">
       <i class="ri-apps-2-line"></i>
       <span>كل المحاصيل والمنتجات</span>
     </button>
@@ -101,6 +148,7 @@ function renderCategoriesBar() {
 
   (storeConfig.categories || []).forEach(cat => {
     const btn = document.createElement("button");
+    btn.type = "button";
     btn.className = `cat-pill ${selectedCategory === cat ? "active" : ""}`;
     btn.dataset.cat = cat;
     btn.innerHTML = `<i class="ri-cup-line"></i><span>${cat}</span>`;
@@ -117,12 +165,12 @@ function renderCategoriesBar() {
 }
 
 function listenToProducts() {
-  const q = query(collection(db, "nafal_products"), orderBy("createdAt", "desc"));
-  onSnapshot(q, (snapshot) => {
+  onSnapshot(collection(db, "nafal_products"), (snapshot) => {
     allProducts = [];
     snapshot.forEach(docSnap => {
       allProducts.push({ id: docSnap.id, ...docSnap.data() });
     });
+    allProducts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     renderProductsGrid();
   });
 }
@@ -146,13 +194,13 @@ function renderProductsGrid() {
   }
 
   filtered.forEach(prod => {
-    const outOfStock = prod.stock <= 0;
+    const outOfStock = Number(prod.stock) <= 0;
     const card = document.createElement("div");
     card.className = "product-card";
 
     card.innerHTML = `
       <div class="product-img-wrap">
-        <img src="${prod.imageUrl}" alt="${prod.name}">
+        <img src="${prod.imageUrl || DEFAULT_COFFEE_IMG}" alt="${prod.name}">
         ${prod.freeDelivery ? `<span class="badge-free-delivery"><i class="ri-truck-line"></i> توصيل مجاني</span>` : ""}
         <span class="badge-category">${prod.category}</span>
       </div>
@@ -161,8 +209,8 @@ function renderProductsGrid() {
         <p class="product-desc">${prod.description || "محصول قهوة مختصة فاخر من نفال"}</p>
         <div class="product-footer">
           <span class="product-price">${prod.price} <small>ريال</small></span>
-          <button class="btn-add" ${outOfStock ? "disabled" : ""}>
-            <i class="${outOfStock ? 'ri-forbid-2-line' : 'ri-add-line'}"></i>
+          <button type="button" class="btn-add" ${outOfStock ? "disabled" : ""}>
+            <i class="${outOfStock ? 'ri-forbid-2-line' : 'ri-shopping-bag-3-line'}"></i>
             <span>${outOfStock ? "نفذت الكمية" : "أضف للسلة"}</span>
           </button>
         </div>
@@ -177,11 +225,11 @@ function renderProductsGrid() {
   });
 }
 
-// 4. إدارة سلة المشتريات وحساب التوصيل الذكي
+// 4. إدارة سلة المشتريات وحساب عروض التوصيل الذكية
 function addToCart(product) {
   const existing = cart.find(item => item.id === product.id);
   if (existing) {
-    if (existing.qty < product.stock) {
+    if (existing.qty < Number(product.stock)) {
       existing.qty += 1;
     } else {
       showToast("وصلت للحد الأقصى المتوفر في المخزون");
@@ -234,7 +282,7 @@ function calculateTotals() {
     if (subtotal >= t2) {
       deliveryFee = f2;
       hint = f2 === 0 
-        ? `مبروك! فاتورتك تجاوزت ${t2} ريال وحصلت على توصيل مجاني` 
+        ? `مبروك! فاتورتك وصلت ${t2} ريال وحصلت على توصيل مجاني` 
         : `مبروك! حصلت على عرض التوصيل المخفض (${f2} ريال فقط)`;
     } else if (subtotal >= t1) {
       deliveryFee = f1;
@@ -335,7 +383,7 @@ document.getElementById("getGpsBtn").addEventListener("click", () => {
   );
 });
 
-// 6. إنشاء الفاتورة، حفظها في القاعدة، وتحويل الطلب لواتساب المتجر
+// 6. إنشاء الفاتورة، حفظها في القاعدة، وحقنها في محادثة واتساب المتجر
 function generateInvoiceNumber() {
   const randomDigits = Math.floor(1000 + Math.random() * 9000);
   return `NF-${randomDigits}`;
@@ -390,7 +438,7 @@ document.getElementById("checkoutForm").addEventListener("submit", async (e) => 
     const itemsSummary = orderData.items.map(i => `• ${i.name} (${i.qty})`).join("\n");
 
     const waText = encodeURIComponent(
-      `*طلب جديد - متجر نفال للقهوة المختصة*\n` +
+      `*طلب جديد - ${storeConfig.storeName || "متجر نفال"}*\n` +
       `*رقم الفاتورة:* #${invoiceNumber}\n` +
       `*العميل:* ${orderData.customerName}\n` +
       `*الجوال:* ${orderData.customerPhone}\n` +
@@ -423,7 +471,7 @@ document.getElementById("checkoutForm").addEventListener("submit", async (e) => 
   }
 });
 
-// 7. نظام متابعة حالة الفواتير المباشر للعميل بالأيقونات
+// 7. متابعة حالة الفواتير المباشرة للعميل بالقوائم المنسدلة (Accordions)
 let unsubscribeInvoices = null;
 
 function listenToCustomerInvoices(searchInvoice = "") {
@@ -431,14 +479,13 @@ function listenToCustomerInvoices(searchInvoice = "") {
   const targetList = searchInvoice ? [searchInvoice.toUpperCase()] : savedInvoices;
 
   if (targetList.length === 0) {
-    container.innerHTML = `<p class="hint-text">لا توجد فواتير محفوظة. يمكنك البحث برقم فاتورتك بالأعلى.</p>`;
+    container.innerHTML = `<p class="hint-text">لا توجد فواتير محفوظة حالياً. يمكنك البحث برقم فاتورتك بالأعلى.</p>`;
     return;
   }
 
   if (unsubscribeInvoices) unsubscribeInvoices();
 
-  const q = query(collection(db, "nafal_orders"), orderBy("createdAt", "desc"));
-  unsubscribeInvoices = onSnapshot(q, (snapshot) => {
+  unsubscribeInvoices = onSnapshot(collection(db, "nafal_orders"), (snapshot) => {
     container.innerHTML = "";
     const matched = [];
 
@@ -448,6 +495,8 @@ function listenToCustomerInvoices(searchInvoice = "") {
         matched.push(data);
       }
     });
+
+    matched.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
     if (matched.length === 0) {
       container.innerHTML = `<p class="hint-text">لم يتم العثور على فاتورة بهذا الرقم.</p>`;
@@ -461,30 +510,58 @@ function listenToCustomerInvoices(searchInvoice = "") {
       { label: "تم التوصيل", icon: "ri-checkbox-circle-line" }
     ];
 
-    matched.forEach(order => {
+    matched.forEach((order, index) => {
+      const isCanceled = order.status === "ملغي";
       const currentIdx = stepsMeta.findIndex(s => s.label === order.status);
 
-      const stepsHtml = stepsMeta.map((st, idx) => `
-        <div class="step-box ${idx <= currentIdx ? "done" : ""}">
-          <i class="${st.icon}"></i>
-          <span>${st.label}</span>
-        </div>
-      `).join("");
+      const stepsHtml = isCanceled 
+        ? `<div class="smart-hint glass-inset" style="color:var(--danger);"><i class="ri-close-circle-line" style="color:var(--danger);"></i> تم إلغاء هذا الطلب</div>`
+        : `<div class="status-steps">
+            ${stepsMeta.map((st, idx) => `
+              <div class="step-box ${idx <= currentIdx ? "done" : ""}">
+                <i class="${st.icon}"></i>
+                <span>${st.label}</span>
+              </div>
+            `).join("")}
+          </div>`;
 
-      const itemsLine = (order.items || []).map(i => `${i.name} × ${i.qty}`).join(" ، ");
+      const itemsLine = (order.items || []).map(i => `• ${i.name} (الكمية: ${i.qty})`).join("<br>");
 
-      const card = document.createElement("div");
-      card.className = "invoice-card";
-      card.innerHTML = `
-        <div class="invoice-top">
-          <strong>فاتورة #${order.invoiceNumber}</strong>
-          <span class="status-pill">${order.status}</span>
+      const accordion = document.createElement("div");
+      accordion.className = `cust-invoice-accordion ${index === 0 ? "open" : ""}`;
+
+      accordion.innerHTML = `
+        <button type="button" class="cust-inv-header">
+          <div class="cust-inv-right">
+            <div class="cust-arrow"><i class="ri-arrow-down-s-line"></i></div>
+            <div>
+              <strong style="font-size:1.02rem; color:var(--espresso);">فاتورة #${order.invoiceNumber}</strong>
+              <div class="hint-text">${order.totalAmount} ريال — ${new Date(order.createdAt || Date.now()).toLocaleDateString("ar-SA")}</div>
+            </div>
+          </div>
+          <span class="status-pill ${isCanceled ? 'canceled' : ''}">
+            <i class="${isCanceled ? 'ri-close-circle-line' : 'ri-loader-2-line'}"></i>
+            <span>${order.status}</span>
+          </span>
+        </button>
+
+        <div class="cust-inv-body">
+          ${stepsHtml}
+          <div class="glass-inset" style="padding:12px; font-size:0.88rem; line-height:1.7;">
+            <strong>تفاصيل الطلب:</strong><br>
+            ${itemsLine}
+            <div style="margin-top:6px; padding-top:6px; border-top:1px dashed rgba(30,19,13,0.12); font-weight:800;">
+              التوصيل: ${order.deliveryFee} ريال | الإجمالي: ${order.totalAmount} ريال
+            </div>
+          </div>
         </div>
-        <div class="hint-text">المنتجات: ${itemsLine}</div>
-        <div><strong>الإجمالي: ${order.totalAmount} ريال</strong> (شامل التوصيل: ${order.deliveryFee} ريال)</div>
-        <div class="status-steps">${stepsHtml}</div>
       `;
-      container.appendChild(card);
+
+      accordion.querySelector(".cust-inv-header").addEventListener("click", () => {
+        accordion.classList.toggle("open");
+      });
+
+      container.appendChild(accordion);
     });
   });
 }
