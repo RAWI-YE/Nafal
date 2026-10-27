@@ -4,43 +4,64 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NAFAL Specialty Roast | نفال للقهوة المختصة</title>
+  <!-- خط تجوال + مكتبة الأيقونات العالمية الاحترافية Remix Icon -->
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- شريط التنبيه العلوي الثابت (يتحدث من غرفة العمليات) -->
-  <div id="topBanner" class="top-banner">
-    المتجر يوصل لداخل شرورة فقط 🚚
+  <!-- خلفية الإضاءة المحيطية (ضرورية لإبراز انعكاس الزجاج بأسلوب أبل) -->
+  <div class="ambient-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
   </div>
 
-  <!-- الهيدر والشعار -->
-  <header class="site-header">
-    <div class="container header-inner">
-      <div class="brand">
-        <div class="logo-circle">☕</div>
-        <div class="brand-text">
-          <h1 id="storeTitle">NAFAL <span>Specialty Roast</span></h1>
-          <p>نفال للقهوة المختصة والمحاصيل الفاخرة</p>
-        </div>
-      </div>
+  <!-- شريط التنبيه العلوي الزجاجي (يتحدث من غرفة العمليات) -->
+  <div class="top-banner-wrapper">
+    <div class="top-banner glass-pill">
+      <i class="ri-map-pin-range-line"></i>
+      <span id="topBanner">المتجر يوصل لداخل شرورة فقط</span>
+    </div>
+  </div>
 
-      <div class="header-actions">
-        <button id="openOrdersBtn" class="btn-outline">
-          📋 فواتيري ومتابعة الطلب
-        </button>
-        <button id="openCartBtn" class="btn-cart">
-          🛒 السلة <span id="cartCount" class="cart-badge">0</span>
-        </button>
+  <!-- الهيدر الزجاجي العائم -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header-glass glass-panel">
+        <div class="brand">
+          <div class="logo-glass">
+            <i class="ri-cup-line"></i>
+          </div>
+          <div class="brand-text">
+            <h1 id="storeTitle">NAFAL <span>Specialty Roast</span></h1>
+            <p>نفال للقهوة المختصة والمحاصيل الفاخرة</p>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button id="openOrdersBtn" class="btn-glass">
+            <i class="ri-file-list-3-line"></i>
+            <span>فواتيري</span>
+          </button>
+          <button id="openCartBtn" class="btn-glass-primary">
+            <i class="ri-shopping-bag-3-line"></i>
+            <span>السلة</span>
+            <span id="cartCount" class="cart-badge">0</span>
+          </button>
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- شريط العروض الذكي (يتحدث من غرفة العمليات) -->
+  <!-- شريط العروض الذكي الزجاجي -->
   <section class="promo-strip">
     <div class="container">
-      <div class="promo-box">
-        <span class="promo-icon">✨</span>
+      <div class="promo-box glass-panel">
+        <div class="promo-icon-box">
+          <i class="ri-sparkling-2-line"></i>
+        </div>
         <p id="promoText">اطلب بـ 100 ريال والتوصيل بـ 5 ريال! وعند الطلب بـ 300 ريال التوصيل مجاني!</p>
       </div>
     </div>
@@ -49,84 +70,120 @@
   <!-- المحتوى الرئيسي: الأقسام والمنتجات -->
   <main class="container main-content">
     
-    <!-- شريط تصفية الأقسام -->
-    <div id="categoriesBar" class="categories-bar">
-      <button class="cat-pill active" data-cat="all">كل المحاصيل والمنتجات</button>
+    <!-- شريط تصفية الأقسام بأسلوب أبل الزجاجي -->
+    <div id="categoriesBar" class="categories-bar glass-panel">
+      <button class="cat-pill active" data-cat="all">
+        <i class="ri-apps-2-line"></i>
+        <span>كل المحاصيل والمنتجات</span>
+      </button>
     </div>
 
     <!-- شبكة المنتجات -->
     <div id="productsGrid" class="products-grid">
-      <div class="loading-box">☕ جاري تحضير قائمة المحاصيل...</div>
+      <div class="loading-box glass-panel">
+        <i class="ri-loader-4-line spin-icon"></i>
+        <span>جاري تحضير قائمة المحاصيل...</span>
+      </div>
     </div>
 
   </main>
 
-  <!-- نافذة سلة المشتريات وإتمام الطلب -->
+  <!-- نافذة سلة المشتريات وإتمام الطلب (زجاجية) -->
   <div id="cartModal" class="modal-overlay hidden">
-    <div class="modal-card">
+    <div class="modal-card glass-modal">
       <div class="modal-header">
-        <h2>🛒 سلة المشتريات وإتمام الطلب</h2>
-        <button id="closeCartBtn" class="close-btn">&times;</button>
+        <div class="modal-title">
+          <i class="ri-shopping-bag-3-line"></i>
+          <h2>سلة المشتريات وإتمام الطلب</h2>
+        </div>
+        <button id="closeCartBtn" class="icon-close-btn" aria-label="إغلاق">
+          <i class="ri-close-line"></i>
+        </button>
       </div>
 
       <div class="modal-body">
         <!-- تنبيه التوصيل الذكي داخل السلة -->
-        <div id="smartDeliveryHint" class="smart-hint"></div>
+        <div class="smart-hint glass-inset">
+          <i class="ri-truck-line"></i>
+          <span id="smartDeliveryHint"></span>
+        </div>
 
         <!-- قائمة المنتجات في السلة -->
         <div id="cartItemsContainer" class="cart-items"></div>
 
         <!-- ملخص الحساب -->
-        <div id="cartSummaryBox" class="cart-summary">
+        <div id="cartSummaryBox" class="cart-summary glass-inset">
           <div class="summary-row">
-            <span>قيمة المنتجات:</span>
+            <span>قيمة المنتجات</span>
             <span><strong id="subtotalAmount">0</strong> ريال</span>
           </div>
           <div class="summary-row">
-            <span>رسوم التوصيل (داخل شرورة):</span>
+            <span>رسوم التوصيل (داخل شرورة)</span>
             <span><strong id="deliveryAmount">0</strong> ريال</span>
           </div>
           <div class="summary-row total-row">
-            <span>الإجمالي النهائي:</span>
+            <span>الإجمالي النهائي</span>
             <span><strong id="finalTotalAmount">0</strong> ريال</span>
           </div>
         </div>
 
         <!-- نموذج بيانات العميل -->
         <form id="checkoutForm" class="checkout-form">
-          <h3>بيانات الاستلام والتوصيل (شرورة)</h3>
+          <div class="section-heading">
+            <i class="ri-user-location-line"></i>
+            <h3>بيانات الاستلام والتوصيل (شرورة)</h3>
+          </div>
 
           <div class="form-group">
             <label>الاسم الكريم *</label>
-            <input type="text" id="custName" placeholder="اكتب اسمك الثلاثي أو اللقب" required>
+            <div class="input-glass-wrap">
+              <i class="ri-user-3-line"></i>
+              <input type="text" id="custName" placeholder="اكتب اسمك الثلاثي أو اللقب" required>
+            </div>
           </div>
 
           <div class="form-group">
             <label>رقم الجوال (واتساب) *</label>
-            <input type="tel" id="custPhone" placeholder="05XXXXXXXX" required>
+            <div class="input-glass-wrap">
+              <i class="ri-smartphone-line"></i>
+              <input type="tel" id="custPhone" placeholder="05XXXXXXXX" required>
+            </div>
           </div>
 
           <div class="form-group">
             <label>البريد الإلكتروني (اختياري)</label>
-            <input type="email" id="custEmail" placeholder="example@mail.com">
+            <div class="input-glass-wrap">
+              <i class="ri-mail-line"></i>
+              <input type="email" id="custEmail" placeholder="example@mail.com">
+            </div>
           </div>
 
           <div class="form-group">
             <label>تحديد الموقع الجغرافي (GPS) *</label>
             <div class="gps-row">
-              <button type="button" id="getGpsBtn" class="btn-gps">📍 اضغط لتحديد موقعك بالـ GPS</button>
-              <input type="text" id="custGpsUrl" placeholder="رابط الموقع الجغرافي سيظهر هنا" readonly required>
+              <button type="button" id="getGpsBtn" class="btn-gps">
+                <i class="ri-compass-3-line"></i>
+                <span>تحديد موقعي بالـ GPS</span>
+              </button>
+              <div class="input-glass-wrap flex-1">
+                <i class="ri-map-pin-2-line"></i>
+                <input type="text" id="custGpsUrl" placeholder="رابط الموقع الجغرافي سيظهر هنا" readonly required>
+              </div>
             </div>
             <small id="gpsStatusText" class="hint-text">يساعدنا في توصيل طلبك بسرعة ودقة داخل شرورة</small>
           </div>
 
           <div class="form-group">
             <label>الحي / رقم المنزل أو ملاحظات إضافية</label>
-            <input type="text" id="custAddress" placeholder="مثال: حي الخالدية - بجوار مسجد...">
+            <div class="input-glass-wrap">
+              <i class="ri-home-4-line"></i>
+              <input type="text" id="custAddress" placeholder="مثال: حي الخالدية - بجوار مسجد...">
+            </div>
           </div>
 
           <button type="submit" id="submitOrderBtn" class="btn-submit-order">
-            إنشاء الفاتورة وتأكيد الطلب عبر واتساب 💬
+            <i class="ri-whatsapp-line"></i>
+            <span>إنشاء الفاتورة وتأكيد الطلب عبر واتساب</span>
           </button>
         </form>
       </div>
@@ -135,17 +192,28 @@
 
   <!-- نافذة فواتيري ومتابعة حالة الطلب مباشرة -->
   <div id="ordersModal" class="modal-overlay hidden">
-    <div class="modal-card">
+    <div class="modal-card glass-modal">
       <div class="modal-header">
-        <h2>📋 فواتيري ومتابعة حالة الطلب</h2>
-        <button id="closeOrdersBtn" class="close-btn">&times;</button>
+        <div class="modal-title">
+          <i class="ri-file-list-3-line"></i>
+          <h2>فواتيري ومتابعة حالة الطلب</h2>
+        </div>
+        <button id="closeOrdersBtn" class="icon-close-btn" aria-label="إغلاق">
+          <i class="ri-close-line"></i>
+        </button>
       </div>
 
       <div class="modal-body">
         <!-- البحث برقم الفاتورة -->
         <div class="track-search-box">
-          <input type="text" id="searchInvoiceInput" placeholder="أدخل رقم الفاتورة (مثال: NF-1234)">
-          <button id="searchInvoiceBtn" class="btn-search">بحث ومتابعة</button>
+          <div class="input-glass-wrap flex-1">
+            <i class="ri-hashtag"></i>
+            <input type="text" id="searchInvoiceInput" placeholder="أدخل رقم الفاتورة (مثال: NF-1234)">
+          </div>
+          <button id="searchInvoiceBtn" class="btn-search">
+            <i class="ri-search-2-line"></i>
+            <span>بحث</span>
+          </button>
         </div>
 
         <div id="customerOrdersList" class="customer-orders-list">
@@ -155,22 +223,37 @@
     </div>
   </div>
 
-  <!-- الفوتر وحسابات التواصل -->
+  <!-- الفوتر الزجاجي وحسابات التواصل -->
   <footer class="site-footer">
-    <div class="container footer-inner">
-      <div class="footer-brand">
-        <h3>NAFAL Specialty Roast</h3>
-        <p>قهوة مختصة تُحمص وتُحضر بشغف - التوصيل داخل شرورة فقط</p>
-      </div>
-      <div class="social-links">
-        <a id="snapchatLink" href="#" target="_blank" class="social-btn snap-btn hidden">👻 سناب شات</a>
-        <a id="tiktokLink" href="#" target="_blank" class="social-btn tiktok-btn hidden">🎵 تيك توك</a>
-        <a id="whatsappFooterLink" href="#" target="_blank" class="social-btn wa-btn hidden">💬 تواصل واتساب</a>
+    <div class="container">
+      <div class="footer-glass glass-panel">
+        <div class="footer-brand">
+          <h3>NAFAL Specialty Roast</h3>
+          <p>قهوة مختصة تُحمص وتُحضر بشغف — التوصيل داخل شرورة فقط</p>
+        </div>
+        <div class="social-links">
+          <a id="snapchatLink" href="#" target="_blank" class="social-btn hidden">
+            <i class="ri-snapchat-line"></i>
+            <span>سناب شات</span>
+          </a>
+          <a id="tiktokLink" href="#" target="_blank" class="social-btn hidden">
+            <i class="ri-tiktok-line"></i>
+            <span>تيك توك</span>
+          </a>
+          <a id="whatsappFooterLink" href="#" target="_blank" class="social-btn wa-social hidden">
+            <i class="ri-whatsapp-line"></i>
+            <span>واتساب</span>
+          </a>
+        </div>
       </div>
     </div>
   </footer>
 
-  <div id="toast" class="toast hidden">تمت الإضافة للسلة</div>
+  <!-- إشعار عائم زجاجي -->
+  <div id="toast" class="toast glass-pill hidden">
+    <i class="ri-checkbox-circle-line"></i>
+    <span id="toastText">تمت الإضافة للسلة</span>
+  </div>
 
   <script type="module" src="app.js"></script>
 </body>
