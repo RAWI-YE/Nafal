@@ -29,7 +29,6 @@ if (getApps().length === 0) {
 
 const DEFAULT_COFFEE_IMG = "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=800&q=80";
 
-// إعدادات المتجر الافتراضية (تتحدث لحظياً من غرفة العمليات)
 let storeConfig = {
   storeName: "NAFAL Specialty Roast",
   storeDescription: "نفال للقهوة المختصة والمحاصيل الفاخرة",
@@ -56,7 +55,10 @@ let selectedCategory = "all";
 let cart = JSON.parse(localStorage.getItem("nafal_cart") || "[]");
 let savedInvoices = JSON.parse(localStorage.getItem("nafal_my_invoices") || "[]");
 
-// إشعار عائم زجاجي
+// متغيرات صفحة تفاصيل المنتج المفتوحة حالياً
+let currentDetailProduct = null;
+let currentDetailQty = 1;
+
 function showToast(msg) {
   const toast = document.getElementById("toast");
   document.getElementById("toastText").textContent = msg;
@@ -64,7 +66,7 @@ function showToast(msg) {
   setTimeout(() => toast.classList.add("hidden"), 2800);
 }
 
-// 2. الاستماع المباشر للهوية، الشعار، العروض، وحسابات التواصل من غرفة العمليات
+// 2. الاستماع المباشر لإعدادات المتجر والهوية
 function listenToStoreSettings() {
   onSnapshot(doc(db, "nafal_settings", "storeConfig"), (snap) => {
     if (snap.exists()) {
@@ -77,16 +79,14 @@ function listenToStoreSettings() {
 }
 
 function applyStoreSettingsToUI() {
-  // تحديث الاسم والوصف في الهيدر والفوتر وعنوان الصفحة
   const name = storeConfig.storeName || "NAFAL Specialty Roast";
   const desc = storeConfig.storeDescription || "نفال للقهوة المختصة والمحاصيل الفاخرة";
   document.title = `${name} | ${desc}`;
   document.getElementById("storeTitle").textContent = name;
   document.getElementById("storeDesc").textContent = desc;
   document.getElementById("footerStoreName").textContent = name;
-  document.getElementById("footerStoreDesc").textContent = `${desc} — التوصيل داخل شرورة فقط`;
+  document.getElementById("footerStoreDesc").textContent = `${desc} — شرورة`;
 
-  // تحديث شعار المتجر (صورة أو أيقونة القهوة الافتراضية)
   const logoImg = document.getElementById("storeLogoImg");
   const logoIcon = document.getElementById("storeLogoIcon");
   if (storeConfig.storeLogo) {
@@ -98,7 +98,6 @@ function applyStoreSettingsToUI() {
     logoIcon.classList.remove("hidden");
   }
 
-  // تحديث شريط شرورة العلوي وشريط العروض
   document.getElementById("topBanner").textContent = storeConfig.bannerText || "المتجر يوصل لداخل شرورة فقط";
   const promoSection = document.getElementById("promoSection");
   if (storeConfig.promoMessage) {
@@ -108,7 +107,6 @@ function applyStoreSettingsToUI() {
     promoSection.classList.add("hidden");
   }
 
-  // تحديث جميع روابط مواقع التواصل الاجتماعي
   toggleSocialLink("snapchatLink", storeConfig.snapchatUrl);
   toggleSocialLink("tiktokLink", storeConfig.tiktokUrl);
   toggleSocialLink("instagramLink", storeConfig.instagramUrl);
@@ -136,7 +134,24 @@ function toggleSocialLink(elementId, url) {
   }
 }
 
-// 3. عرض الأقسام والمنتجات بشكل شبكي متناسق
+// استخراج مصفوفة صور المنتج بمرونة (يدعم صورة واحدة أو عدة صور)
+function getProductImages(prod) {
+  const list = [];
+  if (Array.isArray(prod.images) && prod.images.length > 0) {
+    prod.images.forEach(u => {
+      if (u && typeof u === "string" && u.trim() !== "") list.push(u.trim());
+    });
+  }
+  if (prod.imageUrl && !list.includes(prod.imageUrl.trim())) {
+    list.unshift(prod.imageUrl.trim());
+  }
+  if (list.length === 0) {
+    list.push(DEFAULT_COFFEE_IMG);
+  }
+  return list;
+}
+
+// 3. عرض الأقسام والمنتجات
 function renderCategoriesBar() {
   const bar = document.getElementById("categoriesBar");
   bar.innerHTML = `
@@ -195,45 +210,191 @@ function renderProductsGrid() {
 
   filtered.forEach(prod => {
     const outOfStock = Number(prod.stock) <= 0;
+    const images = getProductImages(prod);
     const card = document.createElement("div");
     card.className = "product-card";
 
     card.innerHTML = `
       <div class="product-img-wrap">
-        <img src="${prod.imageUrl || DEFAULT_COFFEE_IMG}" alt="${prod.name}">
+        <img src="${images[0]}" alt="${prod.name}">
         ${prod.freeDelivery ? `<span class="badge-free-delivery"><i class="ri-truck-line"></i> توصيل مجاني</span>` : ""}
         <span class="badge-category">${prod.category}</span>
+        ${images.length > 1 ? `<span class="multi-img-indicator"><i class="ri-image-2-line"></i> ${images.length}</span>` : ""}
       </div>
       <div class="product-info">
         <h3 class="product-title">${prod.name}</h3>
-        <p class="product-desc">${prod.description || "محصول قهوة مختصة فاخر من نفال"}</p>
+        <p class="product-desc">${prod.description || "اضغط لعرض التفاصيل الكاملة للمحصول"}</p>
         <div class="product-footer">
           <span class="product-price">${prod.price} <small>ريال</small></span>
           <button type="button" class="btn-add" ${outOfStock ? "disabled" : ""}>
-            <i class="${outOfStock ? 'ri-forbid-2-line' : 'ri-shopping-bag-3-line'}"></i>
-            <span>${outOfStock ? "نفذت الكمية" : "أضف للسلة"}</span>
+            <i class="${outOfStock ? 'ri-forbid-2-line' : 'ri-add-line'}"></i>
+            <span>${outOfStock ? "نفذت" : "أضف"}</span>
           </button>
         </div>
       </div>
     `;
 
+    // الضغط على البطاقة يفتح صفحة تفاصيل المنتج الكاملة
+    card.addEventListener("click", (e) => {
+      if (e.target.closest(".btn-add")) return;
+      openProductDetailModal(prod);
+    });
+
+    // زر الإضافة السريعة للسلة
     if (!outOfStock) {
-      card.querySelector(".btn-add").addEventListener("click", () => addToCart(prod));
+      card.querySelector(".btn-add").addEventListener("click", (e) => {
+        e.stopPropagation();
+        addToCart(prod, 1);
+      });
     }
 
     grid.appendChild(card);
   });
 }
 
-// 4. إدارة سلة المشتريات وحساب عروض التوصيل الذكية
-function addToCart(product) {
+// 4. نافذة صفحة تفاصيل المنتج الكاملة (معرض الصور + المواصفات + الكمية)
+function openProductDetailModal(prod) {
+  currentDetailProduct = prod;
+  currentDetailQty = 1;
+
+  const images = getProductImages(prod);
+  const outOfStock = Number(prod.stock) <= 0;
+
+  document.getElementById("detailTitle").textContent = prod.name;
+  document.getElementById("detailPrice").textContent = prod.price;
+  document.getElementById("detailCategoryBadge").textContent = prod.category || "محاصيل مختصة";
+
+  const freeBadge = document.getElementById("detailFreeBadge");
+  if (prod.freeDelivery) {
+    freeBadge.classList.remove("hidden");
+  } else {
+    freeBadge.classList.add("hidden");
+  }
+
+  // حالة المخزون
+  const stockEl = document.getElementById("detailStockStatus");
+  if (outOfStock) {
+    stockEl.className = "stock-pill out";
+    stockEl.innerHTML = `<i class="ri-close-circle-fill"></i> نفذت الكمية حالياً`;
+  } else {
+    stockEl.className = "stock-pill";
+    stockEl.innerHTML = `<i class="ri-checkbox-circle-fill"></i> متوفر في المخزون (${prod.stock} قطعة)`;
+  }
+
+  // معرض الصور (الصورة الرئيسية + المصغرات)
+  const mainImg = document.getElementById("detailMainImg");
+  const thumbsContainer = document.getElementById("detailThumbnails");
+  mainImg.src = images[0];
+  thumbsContainer.innerHTML = "";
+
+  if (images.length > 1) {
+    thumbsContainer.classList.remove("hidden");
+    images.forEach((imgUrl, idx) => {
+      const thumb = document.createElement("div");
+      thumb.className = `thumb-item ${idx === 0 ? "active" : ""}`;
+      thumb.innerHTML = `<img src="${imgUrl}" alt="صورة ${idx + 1}">`;
+      thumb.addEventListener("click", () => {
+        mainImg.src = imgUrl;
+        thumbsContainer.querySelectorAll(".thumb-item").forEach(t => t.classList.remove("active"));
+        thumb.classList.add("active");
+      });
+      thumbsContainer.appendChild(thumb);
+    });
+  } else {
+    thumbsContainer.classList.add("hidden");
+  }
+
+  // المواصفات التفصيلية (الوزن، المعالجة، التحميص، الإيحاءات - تعمل تلقائياً إذا أضيفت من غرفة العمليات)
+  const specsGrid = document.getElementById("detailSpecsGrid");
+  specsGrid.innerHTML = "";
+  const specsList = [
+    { label: "الوزن / الحجم", val: prod.weight, icon: "ri-scales-3-line" },
+    { label: "المعالجة / المصدر", val: prod.process, icon: "ri-earth-line" },
+    { label: "درجة التحميص", val: prod.roastLevel, icon: "ri-fire-line" },
+    { label: "الإيحاءات", val: prod.notes, icon: "ri-sparkling-line" }
+  ].filter(s => s.val && String(s.val).trim() !== "");
+
+  if (specsList.length > 0) {
+    specsGrid.classList.remove("hidden");
+    specsList.forEach(sp => {
+      const box = document.createElement("div");
+      box.className = "spec-card";
+      box.innerHTML = `
+        <i class="${sp.icon}"></i>
+        <div>
+          <small>${sp.label}</small>
+          <strong>${sp.val}</strong>
+        </div>
+      `;
+      specsGrid.appendChild(box);
+    });
+  } else {
+    specsGrid.classList.add("hidden");
+  }
+
+  // الوصف الكامل
+  document.getElementById("detailFullDesc").textContent = 
+    prod.fullDescription || prod.description || "محصول قهوة مختصة فاخر محمص بعناية ليمنحك تجربة استثنائية.";
+
+  updateDetailModalQtyUI();
+  document.getElementById("productDetailModal").classList.remove("hidden");
+}
+
+function updateDetailModalQtyUI() {
+  if (!currentDetailProduct) return;
+  const outOfStock = Number(currentDetailProduct.stock) <= 0;
+  document.getElementById("detailQtyValue").textContent = currentDetailQty;
+  const addBtn = document.getElementById("detailAddToCartBtn");
+  const addBtnText = document.getElementById("detailAddBtnText");
+
+  if (outOfStock) {
+    addBtn.disabled = true;
+    addBtnText.textContent = "نفذت الكمية";
+  } else {
+    addBtn.disabled = false;
+    const totalPrice = Number(currentDetailProduct.price) * currentDetailQty;
+    addBtnText.textContent = `إضافة للسلة (${totalPrice} ريال)`;
+  }
+}
+
+document.getElementById("detailQtyMinus").addEventListener("click", () => {
+  if (currentDetailQty > 1) {
+    currentDetailQty -= 1;
+    updateDetailModalQtyUI();
+  }
+});
+
+document.getElementById("detailQtyPlus").addEventListener("click", () => {
+  if (!currentDetailProduct) return;
+  if (currentDetailQty < Number(currentDetailProduct.stock)) {
+    currentDetailQty += 1;
+    updateDetailModalQtyUI();
+  } else {
+    showToast("وصلت للحد الأقصى المتوفر في المخزون");
+  }
+});
+
+document.getElementById("detailAddToCartBtn").addEventListener("click", () => {
+  if (!currentDetailProduct) return;
+  addToCart(currentDetailProduct, currentDetailQty);
+  document.getElementById("productDetailModal").classList.add("hidden");
+});
+
+document.getElementById("closeDetailBtn").addEventListener("click", () => {
+  document.getElementById("productDetailModal").classList.add("hidden");
+});
+
+// 5. إدارة سلة المشتريات والشريط العائم السفلي
+function addToCart(product, qtyToAdd = 1) {
   const existing = cart.find(item => item.id === product.id);
+  const maxStock = Number(product.stock);
+
   if (existing) {
-    if (existing.qty < Number(product.stock)) {
-      existing.qty += 1;
+    if (existing.qty + qtyToAdd <= maxStock) {
+      existing.qty += qtyToAdd;
     } else {
-      showToast("وصلت للحد الأقصى المتوفر في المخزون");
-      return;
+      existing.qty = maxStock;
+      showToast("تمت إضافة الحد الأقصى المتوفر في المخزون");
     }
   } else {
     cart.push({
@@ -241,8 +402,8 @@ function addToCart(product) {
       name: product.name,
       price: Number(product.price),
       freeDelivery: !!product.freeDelivery,
-      qty: 1,
-      maxStock: Number(product.stock)
+      qty: Math.min(qtyToAdd, maxStock),
+      maxStock
     });
   }
   saveCart();
@@ -304,7 +465,10 @@ function calculateTotals() {
 
 function updateCartUI() {
   const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+  const totals = calculateTotals();
+
   document.getElementById("cartCount").textContent = totalCount;
+  document.getElementById("dockTotalAmount").textContent = totals.subtotal;
 
   const container = document.getElementById("cartItemsContainer");
   container.innerHTML = "";
@@ -347,14 +511,13 @@ function updateCartUI() {
     container.appendChild(row);
   });
 
-  const totals = calculateTotals();
   document.getElementById("smartDeliveryHint").textContent = totals.hint;
   document.getElementById("subtotalAmount").textContent = totals.subtotal;
   document.getElementById("deliveryAmount").textContent = totals.deliveryFee;
   document.getElementById("finalTotalAmount").textContent = totals.total;
 }
 
-// 5. تحديد الموقع الجغرافي (GPS) للعميل
+// 6. تحديد الموقع الجغرافي (GPS) للعميل
 document.getElementById("getGpsBtn").addEventListener("click", () => {
   const statusText = document.getElementById("gpsStatusText");
   const gpsInput = document.getElementById("custGpsUrl");
@@ -383,7 +546,7 @@ document.getElementById("getGpsBtn").addEventListener("click", () => {
   );
 });
 
-// 6. إنشاء الفاتورة، حفظها في القاعدة، وحقنها في محادثة واتساب المتجر
+// 7. إنشاء الفاتورة وتحويل الطلب لواتساب المتجر
 function generateInvoiceNumber() {
   const randomDigits = Math.floor(1000 + Math.random() * 9000);
   return `NF-${randomDigits}`;
@@ -471,7 +634,7 @@ document.getElementById("checkoutForm").addEventListener("submit", async (e) => 
   }
 });
 
-// 7. متابعة حالة الفواتير المباشرة للعميل بالقوائم المنسدلة (Accordions)
+// 8. متابعة حالة الفواتير المباشرة للعميل بالقوائم المنسدلة
 let unsubscribeInvoices = null;
 
 function listenToCustomerInvoices(searchInvoice = "") {
@@ -571,7 +734,7 @@ document.getElementById("searchInvoiceBtn").addEventListener("click", () => {
   listenToCustomerInvoices(val);
 });
 
-// 8. فتح وإغلاق النوافذ
+// 9. فتح وإغلاق النوافذ
 document.getElementById("openCartBtn").addEventListener("click", () => {
   updateCartUI();
   document.getElementById("cartModal").classList.remove("hidden");
@@ -588,6 +751,15 @@ document.getElementById("openOrdersBtn").addEventListener("click", () => {
 
 document.getElementById("closeOrdersBtn").addEventListener("click", () => {
   document.getElementById("ordersModal").classList.add("hidden");
+});
+
+// إغلاق أي نافذة عند الضغط خارج البطاقة الزجاجية
+document.querySelectorAll(".modal-overlay").forEach(overlay => {
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+      overlay.classList.add("hidden");
+    }
+  });
 });
 
 // تشغيل المتجر
