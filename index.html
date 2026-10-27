@@ -17,55 +17,35 @@
     <div class="orb orb-3"></div>
   </div>
 
-  <!-- شريط التنبيه العلوي الثابت (يتحدث مباشرة من غرفة العمليات) -->
-  <div class="top-banner-wrapper">
-    <div class="top-banner glass-pill">
-      <i class="ri-map-pin-range-fill"></i>
-      <span id="topBanner">المتجر يوصل لداخل شرورة فقط</span>
-    </div>
-  </div>
-
-  <!-- الهيدر الزجاجي العائم -->
-  <header class="site-header">
+  <!-- الترويسة الفخمة والمختصرة (خالية من الزحمة) -->
+  <header class="hero-header">
     <div class="container">
-      <div class="header-glass glass-panel">
-        <div class="brand">
+      <div class="hero-glass glass-panel">
+        <div class="hero-brand">
           <div class="logo-glass">
             <img id="storeLogoImg" src="" alt="شعار المتجر" class="hidden">
             <i id="storeLogoIcon" class="ri-cup-line"></i>
           </div>
-          <div class="brand-text">
-            <h1 id="storeTitle">NAFAL <span>Specialty Roast</span></h1>
+          <div class="brand-info">
+            <div class="title-row">
+              <h1 id="storeTitle">NAFAL <span>Specialty Roast</span></h1>
+              <span class="location-badge">
+                <i class="ri-map-pin-2-fill"></i>
+                <span id="topBanner">المتجر يوصل لداخل شرورة فقط</span>
+              </span>
+            </div>
             <p id="storeDesc">نفال للقهوة المختصة والمحاصيل الفاخرة</p>
           </div>
         </div>
 
-        <div class="header-actions">
-          <button type="button" id="openOrdersBtn" class="btn-glass">
-            <i class="ri-file-list-3-line"></i>
-            <span>فواتيري</span>
-          </button>
-          <button type="button" id="openCartBtn" class="btn-glass-primary">
-            <i class="ri-shopping-bag-3-line"></i>
-            <span>السلة</span>
-            <span id="cartCount" class="cart-badge">0</span>
-          </button>
+        <!-- شريط العروض المدمج الخفيف -->
+        <div id="promoSection" class="slim-promo glass-inset">
+          <i class="ri-sparkling-2-fill"></i>
+          <span id="promoText">اطلب بـ 100 ريال والتوصيل بـ 5 ريال! وعند الطلب بـ 300 ريال التوصيل مجاني!</span>
         </div>
       </div>
     </div>
   </header>
-
-  <!-- شريط العروض الذكي الزجاجي -->
-  <section id="promoSection" class="promo-strip">
-    <div class="container">
-      <div class="promo-box glass-panel">
-        <div class="promo-icon-box">
-          <i class="ri-sparkling-2-fill"></i>
-        </div>
-        <p id="promoText">اطلب بـ 100 ريال والتوصيل بـ 5 ريال! وعند الطلب بـ 300 ريال التوصيل مجاني!</p>
-      </div>
-    </div>
-  </section>
 
   <!-- المحتوى الرئيسي: الأقسام والمنتجات -->
   <main class="container main-content">
@@ -88,7 +68,133 @@
 
   </main>
 
-  <!-- نافذة سلة المشتريات وإتمام الطلب -->
+  <!-- الفوتر الزجاجي وحسابات التواصل الاجتماعي -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-glass glass-panel">
+        <div class="footer-brand">
+          <h3 id="footerStoreName">NAFAL Specialty Roast</h3>
+          <p id="footerStoreDesc">نفال للقهوة المختصة والمحاصيل الفاخرة — شرورة</p>
+        </div>
+
+        <div class="social-links">
+          <a id="snapchatLink" href="#" target="_blank" class="social-btn hidden">
+            <i class="ri-snapchat-line"></i>
+            <span>سناب شات</span>
+          </a>
+          <a id="tiktokLink" href="#" target="_blank" class="social-btn hidden">
+            <i class="ri-tiktok-line"></i>
+            <span>تيك توك</span>
+          </a>
+          <a id="instagramLink" href="#" target="_blank" class="social-btn hidden">
+            <i class="ri-instagram-line"></i>
+            <span>إنستغرام</span>
+          </a>
+          <a id="twitterLink" href="#" target="_blank" class="social-btn hidden">
+            <i class="ri-twitter-x-line"></i>
+            <span>منصة إكس</span>
+          </a>
+          <a id="mapsLink" href="#" target="_blank" class="social-btn hidden">
+            <i class="ri-map-pin-2-line"></i>
+            <span>موقعنا</span>
+          </a>
+          <a id="whatsappFooterLink" href="#" target="_blank" class="social-btn wa-social hidden">
+            <i class="ri-whatsapp-line"></i>
+            <span>واتساب</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- الشريط العائم السفلي بأسلوب أبل (للسلة والفواتير) -->
+  <div class="floating-dock-wrapper">
+    <nav class="floating-dock glass-pill">
+      <button type="button" id="openOrdersBtn" class="dock-btn">
+        <i class="ri-file-list-3-line"></i>
+        <span>فواتيري</span>
+      </button>
+
+      <div class="dock-divider"></div>
+
+      <button type="button" id="openCartBtn" class="dock-cart-btn">
+        <div class="dock-cart-right">
+          <i class="ri-shopping-bag-3-fill"></i>
+          <span>السلة</span>
+          <span id="cartCount" class="dock-badge">0</span>
+        </div>
+        <div class="dock-cart-total">
+          <span id="dockTotalAmount">0</span> <small>ريال</small>
+        </div>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ==================== 1. نافذة صفحة تفاصيل المنتج الكاملة ==================== -->
+  <div id="productDetailModal" class="modal-overlay hidden">
+    <div class="modal-card glass-modal product-detail-modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="ri-cup-line"></i>
+          <h2 id="detailModalHeaderTitle">تفاصيل المحصول</h2>
+        </div>
+        <button type="button" id="closeDetailBtn" class="icon-close-btn" aria-label="إغلاق">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+
+      <div class="modal-body detail-body">
+        <!-- معرض صور المنتج (صورة رئيسية + مصغرات) -->
+        <div class="detail-gallery">
+          <div class="main-img-stage glass-inset">
+            <img id="detailMainImg" src="" alt="صورة المنتج">
+            <span id="detailFreeBadge" class="badge-free-delivery hidden">
+              <i class="ri-truck-line"></i> توصيل مجاني
+            </span>
+            <span id="detailCategoryBadge" class="badge-category"></span>
+          </div>
+          <div id="detailThumbnails" class="thumbnails-row hidden"></div>
+        </div>
+
+        <!-- معلومات وتفاصيل المنتج -->
+        <div class="detail-info-col">
+          <div class="detail-title-price">
+            <h3 id="detailTitle"></h3>
+            <div class="detail-price-box">
+              <span id="detailPrice">0</span> <small>ريال</small>
+            </div>
+          </div>
+
+          <div id="detailStockStatus" class="stock-pill"></div>
+
+          <!-- بطاقات المواصفات السريعة (الوزن، الإيحاءات، التحضير) إن وجدت -->
+          <div id="detailSpecsGrid" class="specs-grid hidden"></div>
+
+          <!-- الوصف الكامل للمنتج -->
+          <div class="detail-desc-box glass-inset">
+            <h4><i class="ri-file-text-line"></i> تفاصيل المحصول والإيحاءات</h4>
+            <p id="detailFullDesc"></p>
+          </div>
+
+          <!-- التحكم بالكمية والإضافة للسلة من داخل صفحة المنتج -->
+          <div class="detail-actions-bar">
+            <div class="detail-qty-selector glass-inset">
+              <button type="button" id="detailQtyMinus" class="qty-btn"><i class="ri-subtract-line"></i></button>
+              <strong id="detailQtyValue">1</strong>
+              <button type="button" id="detailQtyPlus" class="qty-btn"><i class="ri-add-line"></i></button>
+            </div>
+
+            <button type="button" id="detailAddToCartBtn" class="btn-detail-add">
+              <i class="ri-shopping-bag-3-line"></i>
+              <span id="detailAddBtnText">إضافة للسلة</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 2. نافذة سلة المشتريات وإتمام الطلب ==================== -->
   <div id="cartModal" class="modal-overlay hidden">
     <div class="modal-card glass-modal">
       <div class="modal-header">
@@ -190,7 +296,7 @@
     </div>
   </div>
 
-  <!-- نافذة فواتيري ومتابعة حالة الطلب (قوائم منسدلة أنيقة) -->
+  <!-- ==================== 3. نافذة فواتيري ومتابعة الطلب ==================== -->
   <div id="ordersModal" class="modal-overlay hidden">
     <div class="modal-card glass-modal">
       <div class="modal-header">
@@ -204,7 +310,6 @@
       </div>
 
       <div class="modal-body">
-        <!-- البحث برقم الفاتورة -->
         <div class="track-search-box">
           <div class="input-glass-wrap flex-1">
             <i class="ri-hashtag"></i>
@@ -218,52 +323,12 @@
 
         <p class="hint-text">اضغط على أي فاتورة لفتح تفاصيلها ومتابعة مراحل تجهيز وتوصيل طلبك مباشرة:</p>
 
-        <!-- قائمة الفواتير المنسدلة للعميل -->
         <div id="customerOrdersList" class="customer-orders-list">
           <p class="hint-text">لا توجد فواتير محفوظة حالياً.</p>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- الفوتر الزجاجي وحسابات التواصل الاجتماعي الشاملة -->
-  <footer class="site-footer">
-    <div class="container">
-      <div class="footer-glass glass-panel">
-        <div class="footer-brand">
-          <h3 id="footerStoreName">NAFAL Specialty Roast</h3>
-          <p id="footerStoreDesc">نفال للقهوة المختصة والمحاصيل الفاخرة — التوصيل داخل شرورة فقط</p>
-        </div>
-
-        <div class="social-links">
-          <a id="snapchatLink" href="#" target="_blank" class="social-btn hidden">
-            <i class="ri-snapchat-line"></i>
-            <span>سناب شات</span>
-          </a>
-          <a id="tiktokLink" href="#" target="_blank" class="social-btn hidden">
-            <i class="ri-tiktok-line"></i>
-            <span>تيك توك</span>
-          </a>
-          <a id="instagramLink" href="#" target="_blank" class="social-btn hidden">
-            <i class="ri-instagram-line"></i>
-            <span>إنستغرام</span>
-          </a>
-          <a id="twitterLink" href="#" target="_blank" class="social-btn hidden">
-            <i class="ri-twitter-x-line"></i>
-            <span>منصة إكس</span>
-          </a>
-          <a id="mapsLink" href="#" target="_blank" class="social-btn hidden">
-            <i class="ri-map-pin-2-line"></i>
-            <span>موقعنا</span>
-          </a>
-          <a id="whatsappFooterLink" href="#" target="_blank" class="social-btn wa-social hidden">
-            <i class="ri-whatsapp-line"></i>
-            <span>تواصل واتساب</span>
-          </a>
-        </div>
-      </div>
-    </div>
-  </footer>
 
   <!-- إشعار عائم زجاجي -->
   <div id="toast" class="toast glass-pill hidden">
