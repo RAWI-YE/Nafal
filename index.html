@@ -9,278 +9,168 @@
 </head>
 <body>
 
-  <!-- الشريط العلوي العريض (يتحدث مباشرة من غرفة العمليات) -->
-  <div class="top-announcement">
-    <p id="topBannerText">المتجر يوصل لداخل شرورة فقط 🚚</p>
+  <!-- شريط التنبيه العلوي الثابت (يتحدث من غرفة العمليات) -->
+  <div id="topBanner" class="top-banner">
+    المتجر يوصل لداخل شرورة فقط 🚚
   </div>
 
   <!-- الهيدر والشعار -->
   <header class="site-header">
     <div class="container header-inner">
-      <div class="brand-box">
-        <div class="logo-mark">☕</div>
-        <div class="brand-titles">
-          <h1 class="en-brand">NAFAL <span>Specialty Roast</span></h1>
-          <p id="storeSubTitle" class="ar-brand">نفال للقهوة المختصة</p>
+      <div class="brand">
+        <div class="logo-circle">☕</div>
+        <div class="brand-text">
+          <h1 id="storeTitle">NAFAL <span>Specialty Roast</span></h1>
+          <p>نفال للقهوة المختصة والمحاصيل الفاخرة</p>
         </div>
       </div>
 
       <div class="header-actions">
-        <!-- روابط التواصل (تظهر تلقائياً عند إضافتها في غرفة العمليات) -->
-        <div class="social-links">
-          <a id="snapchatHeaderLink" href="#" target="_blank" rel="noopener" class="social-icon hidden" title="سناب شات">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-              <path d="M12 2c2.9 0 5.2 2.1 5.4 5 .1 1.2-.1 2.4-.2 3.1.2.2.6.4 1.1.5.5.2.9.4.9.9 0 .5-.5.8-1.1 1-.6.2-1.1.4-1.3.8-.2.4.1 1 .6 1.6.8.9 2 1.6 3.1 1.8.4.1.6.3.6.6 0 .4-.5.8-1.5 1.1-.8.2-1.4.4-1.6 1-.1.4-.3.7-.8.7-.4 0-.9-.2-1.6-.3-.7-.1-1.5-.2-2.6-.2s-1.9.1-2.6.2c-.7.1-1.2.3-1.6.3-.5 0-.7-.3-.8-.7-.2-.6-.8-.8-1.6-1-1-.3-1.5-.7-1.5-1.1 0-.3.2-.5.6-.6 1.1-.2 2.3-.9 3.1-1.8.5-.6.8-1.2.6-1.6-.2-.4-.7-.6-1.3-.8-.6-.2-1.1-.5-1.1-1 0-.5.4-.7.9-.9.5-.1.9-.3 1.1-.5-.1-.7-.3-1.9-.2-3.1C6.8 4.1 9.1 2 12 2z"/>
-            </svg>
-          </a>
-          <a id="tiktokHeaderLink" href="#" target="_blank" rel="noopener" class="social-icon hidden" title="تيك توك">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-            </svg>
-          </a>
-        </div>
-
-        <button id="openMyOrdersBtn" class="btn-outline">
-          📋 فواتيري <span id="myOrdersBadge" class="count-pill hidden">0</span>
+        <button id="openOrdersBtn" class="btn-outline">
+          📋 فواتيري ومتابعة الطلب
         </button>
-
         <button id="openCartBtn" class="btn-cart">
-          🛒 السلة <span id="headerCartCount" class="count-pill">0</span>
+          🛒 السلة <span id="cartCount" class="cart-badge">0</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- شريط العرض الترويجي للعملاء -->
-  <section id="promoStrip" class="promo-strip">
+  <!-- شريط العروض الذكي (يتحدث من غرفة العمليات) -->
+  <section class="promo-strip">
     <div class="container">
       <div class="promo-box">
-        <span class="promo-tag">عرض التوصيل الذكي ✨</span>
-        <p id="promoStripText">اطلب محاصيلك المفضلة واستمتع بعروض التوصيل داخل شرورة!</p>
+        <span class="promo-icon">✨</span>
+        <p id="promoText">اطلب بـ 100 ريال والتوصيل بـ 5 ريال! وعند الطلب بـ 300 ريال التوصيل مجاني!</p>
       </div>
     </div>
   </section>
 
-  <!-- قسم البحث والتصنيفات والمنتجات -->
-  <main class="container main-section">
-    <div class="controls-bar">
-      <div id="categoriesBar" class="categories-scroll">
-        <button class="cat-pill active" data-cat="all">كل المنتجات</button>
-      </div>
-
-      <div class="search-wrapper">
-        <input type="search" id="searchInput" placeholder="ابحث عن محصول أو أداة قهوة...">
-      </div>
+  <!-- المحتوى الرئيسي: الأقسام والمنتجات -->
+  <main class="container main-content">
+    
+    <!-- شريط تصفية الأقسام -->
+    <div id="categoriesBar" class="categories-bar">
+      <button class="cat-pill active" data-cat="all">كل المحاصيل والمنتجات</button>
     </div>
 
-    <!-- شبكة عرض المنتجات -->
+    <!-- شبكة المنتجات -->
     <div id="productsGrid" class="products-grid">
-      <div class="loading-state">جاري تحضير قائمة المحاصيل... ☕</div>
+      <div class="loading-box">☕ جاري تحضير قائمة المحاصيل...</div>
     </div>
+
   </main>
 
-  <!-- الفوتر -->
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div>
-        <h3>NAFAL <span>Specialty Roast</span></h3>
-        <p>قهوة مختصة محمصة بعناية — خدمة التوصيل داخل شرورة فقط.</p>
-      </div>
-      <div class="footer-socials">
-        <a id="snapchatFooterLink" href="#" target="_blank" rel="noopener" class="footer-link hidden">سناب شات</a>
-        <a id="tiktokFooterLink" href="#" target="_blank" rel="noopener" class="footer-link hidden">تيك توك</a>
-      </div>
-    </div>
-  </footer>
-
-  <!-- شريط السلة العائم للجوال -->
-  <div id="floatingCartBar" class="floating-cart hidden">
-    <div class="floating-cart-info">
-      <span id="floatingCartCount" class="floating-badge">0</span>
-      <span>عرض السلة وإتمام الطلب</span>
-    </div>
-    <strong id="floatingCartTotal">0 ريال</strong>
-  </div>
-
-  <!-- نافذة السلة وإتمام الطلب -->
+  <!-- نافذة سلة المشتريات وإتمام الطلب -->
   <div id="cartModal" class="modal-overlay hidden">
-    <div class="modal-sheet">
+    <div class="modal-card">
       <div class="modal-header">
-        <h2>🛒 سلة المشتريات</h2>
+        <h2>🛒 سلة المشتريات وإتمام الطلب</h2>
         <button id="closeCartBtn" class="close-btn">&times;</button>
       </div>
 
       <div class="modal-body">
-        <!-- شريط التقدم الذكي لعروض التوصيل -->
-        <div id="smartOfferBar" class="smart-offer-card hidden">
-          <p id="smartOfferText"></p>
-          <div class="progress-track">
-            <div id="smartOfferFill" class="progress-fill"></div>
-          </div>
-        </div>
+        <!-- تنبيه التوصيل الذكي داخل السلة -->
+        <div id="smartDeliveryHint" class="smart-hint"></div>
 
-        <!-- رسالة السلة الفارغة -->
-        <div id="emptyCartMsg" class="empty-cart-box">
-          <div class="empty-icon">☕</div>
-          <p>سلتك فارغة حالياً، اختر محاصيلك المفضلة من المتجر.</p>
-        </div>
+        <!-- قائمة المنتجات في السلة -->
+        <div id="cartItemsContainer" class="cart-items"></div>
 
-        <!-- عناصر السلة ونموذج الطلب -->
-        <div id="cartCheckoutSection" class="hidden">
-          <div id="cartItemsContainer" class="cart-items-list"></div>
-
-          <!-- ملخص الحساب -->
-          <div class="summary-card">
-            <div class="summary-row">
-              <span>مجموع المنتجات:</span>
-              <strong id="summarySubtotal">0 ريال</strong>
-            </div>
-            <div class="summary-row">
-              <span>رسوم التوصيل (شرورة):</span>
-              <strong id="summaryDelivery">0 ريال</strong>
-            </div>
-            <div class="summary-row total-row">
-              <span>الإجمالي النهائي:</span>
-              <strong id="summaryTotal">0 ريال</strong>
-            </div>
-          </div>
-
-          <!-- نموذج بيانات العميل والـ GPS -->
-          <form id="checkoutForm" class="checkout-form">
-            <h3>📍 بيانات الاستلام داخل شرورة</h3>
-
-            <div class="field-group">
-              <label>الاسم الكريم *</label>
-              <input type="text" id="custName" placeholder="اكتب اسمك هنا" required>
-            </div>
-
-            <div class="field-group">
-              <label>رقم الجوال (للتواصل عند التوصيل) *</label>
-              <input type="tel" id="custPhone" placeholder="05XXXXXXXX" dir="ltr" required>
-            </div>
-
-            <div class="field-group">
-              <label>البريد الإلكتروني (اختياري)</label>
-              <input type="email" id="custEmail" placeholder="example@mail.com" dir="ltr">
-            </div>
-
-            <div class="field-group">
-              <label>الحي / وصف مختصر للمنزل داخل شرورة *</label>
-              <input type="text" id="custAddress" placeholder="مثال: حي سلطانة، بجوار مسجد..." required>
-            </div>
-
-            <div class="field-group">
-              <label>الموقع الجغرافي الدقيق (GPS) *</label>
-              <button type="button" id="getGpsBtn" class="btn-gps">📍 اضغط لتحديد موقعي الحالي (GPS)</button>
-              <input type="hidden" id="custGpsUrl">
-              <small id="gpsStatusText" class="gps-hint">يرجى تحديد موقعك ليسهل على المندوب الوصول إليك بسرعة.</small>
-            </div>
-
-            <button type="submit" id="createInvoiceBtn" class="btn-submit-order">
-              إنشاء الفاتورة ومتابعة التأكيد
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- نافذة الفاتورة ومتابعة حالة الطلب وتأكيد الواتساب -->
-  <div id="invoiceModal" class="modal-overlay hidden">
-    <div class="modal-sheet invoice-sheet">
-      <div class="modal-header">
-        <h2>🧾 تفاصيل الفاتورة وحالة الطلب</h2>
-        <button id="closeInvoiceBtn" class="close-btn">&times;</button>
-      </div>
-
-      <div class="modal-body">
-        <div class="invoice-top-banner">
-          <div>
-            <span class="muted-label">رقم الفاتورة المرجعي</span>
-            <h3 id="invNumberDisplay" class="inv-code">#NF-0000</h3>
-          </div>
-          <button id="copyInvBtn" class="btn-copy">نسخ الرقم</button>
-        </div>
-
-        <div class="inv-meta-bar">
-          <span id="invDateDisplay"></span>
-          <span id="invStatusBadge" class="status-pill">جديد - قيد المراجعة</span>
-        </div>
-
-        <!-- تنبيه الإلغاء إن وجد -->
-        <div id="invCancelledAlert" class="cancelled-alert hidden">
-          ⚠️ هذه الفاتورة ملغية. للاستفسار تواصل معنا عبر الواتساب.
-        </div>
-
-        <!-- متتبع مراحل الطلب المباشر (يتحدث لحظياً من غرفة العمليات) -->
-        <div id="invTrackerSteps" class="tracker-steps">
-          <div class="step-item" data-step="1">
-            <div class="step-circle">1</div>
-            <span>تم المراجعة</span>
-          </div>
-          <div class="step-item" data-step="2">
-            <div class="step-circle">2</div>
-            <span>جاري التجهيز</span>
-          </div>
-          <div class="step-item" data-step="3">
-            <div class="step-circle">3</div>
-            <span>مع المندوب</span>
-          </div>
-          <div class="step-item" data-step="4">
-            <div class="step-circle">4</div>
-            <span>تم التوصيل</span>
-          </div>
-        </div>
-
-        <div id="invCustomerInfo" class="inv-details-box"></div>
-        <div id="invItemsList" class="inv-items-box"></div>
-
-        <div class="summary-card">
+        <!-- ملخص الحساب -->
+        <div id="cartSummaryBox" class="cart-summary">
           <div class="summary-row">
             <span>قيمة المنتجات:</span>
-            <strong id="invSubtotal">0 ريال</strong>
+            <span><strong id="subtotalAmount">0</strong> ريال</span>
           </div>
           <div class="summary-row">
-            <span>التوصيل:</span>
-            <strong id="invDelivery">0 ريال</strong>
+            <span>رسوم التوصيل (داخل شرورة):</span>
+            <span><strong id="deliveryAmount">0</strong> ريال</span>
           </div>
           <div class="summary-row total-row">
-            <span>الإجمالي:</span>
-            <strong id="invTotal">0 ريال</strong>
+            <span>الإجمالي النهائي:</span>
+            <span><strong id="finalTotalAmount">0</strong> ريال</span>
           </div>
         </div>
 
-        <a id="confirmWhatsappBtn" href="#" target="_blank" rel="noopener" class="btn-whatsapp-confirm">
-          💬 تأكيد الطلب عبر واتساب الآن
-        </a>
-        <p class="wa-note">عند الضغط سيتم تحويلك لواتساب المتجر مع رقم فاتورتك المختصر وبياناتك جاهزة للإرسال.</p>
+        <!-- نموذج بيانات العميل -->
+        <form id="checkoutForm" class="checkout-form">
+          <h3>بيانات الاستلام والتوصيل (شرورة)</h3>
+
+          <div class="form-group">
+            <label>الاسم الكريم *</label>
+            <input type="text" id="custName" placeholder="اكتب اسمك الثلاثي أو اللقب" required>
+          </div>
+
+          <div class="form-group">
+            <label>رقم الجوال (واتساب) *</label>
+            <input type="tel" id="custPhone" placeholder="05XXXXXXXX" required>
+          </div>
+
+          <div class="form-group">
+            <label>البريد الإلكتروني (اختياري)</label>
+            <input type="email" id="custEmail" placeholder="example@mail.com">
+          </div>
+
+          <div class="form-group">
+            <label>تحديد الموقع الجغرافي (GPS) *</label>
+            <div class="gps-row">
+              <button type="button" id="getGpsBtn" class="btn-gps">📍 اضغط لتحديد موقعك بالـ GPS</button>
+              <input type="text" id="custGpsUrl" placeholder="رابط الموقع الجغرافي سيظهر هنا" readonly required>
+            </div>
+            <small id="gpsStatusText" class="hint-text">يساعدنا في توصيل طلبك بسرعة ودقة داخل شرورة</small>
+          </div>
+
+          <div class="form-group">
+            <label>الحي / رقم المنزل أو ملاحظات إضافية</label>
+            <input type="text" id="custAddress" placeholder="مثال: حي الخالدية - بجوار مسجد...">
+          </div>
+
+          <button type="submit" id="submitOrderBtn" class="btn-submit-order">
+            إنشاء الفاتورة وتأكيد الطلب عبر واتساب 💬
+          </button>
+        </form>
       </div>
     </div>
   </div>
 
-  <!-- نافذة فواتيري / تتبع طلب سابق -->
-  <div id="myOrdersModal" class="modal-overlay hidden">
-    <div class="modal-sheet">
+  <!-- نافذة فواتيري ومتابعة حالة الطلب مباشرة -->
+  <div id="ordersModal" class="modal-overlay hidden">
+    <div class="modal-card">
       <div class="modal-header">
-        <h2>📋 فواتيري وتتبع الطلبات</h2>
-        <button id="closeMyOrdersBtn" class="close-btn">&times;</button>
+        <h2>📋 فواتيري ومتابعة حالة الطلب</h2>
+        <button id="closeOrdersBtn" class="close-btn">&times;</button>
       </div>
 
       <div class="modal-body">
-        <div class="lookup-box">
-          <input type="text" id="lookupInput" placeholder="ابحث برقم الفاتورة (مثل NF-1234) أو رقم جوالك">
-          <button id="lookupBtn" class="btn-lookup">بحث</button>
+        <!-- البحث برقم الفاتورة -->
+        <div class="track-search-box">
+          <input type="text" id="searchInvoiceInput" placeholder="أدخل رقم الفاتورة (مثال: NF-1234)">
+          <button id="searchInvoiceBtn" class="btn-search">بحث ومتابعة</button>
         </div>
 
-        <div id="myOrdersList" class="my-orders-list">
-          <p class="muted-label">لا توجد فواتير محفوظة على هذا المتصفح بعد.</p>
+        <div id="customerOrdersList" class="customer-orders-list">
+          <p class="hint-text">لا توجد فواتير محفوظة حالياً.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- إشعار خفيف -->
-  <div id="toast" class="toast hidden"></div>
+  <!-- الفوتر وحسابات التواصل -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <h3>NAFAL Specialty Roast</h3>
+        <p>قهوة مختصة تُحمص وتُحضر بشغف - التوصيل داخل شرورة فقط</p>
+      </div>
+      <div class="social-links">
+        <a id="snapchatLink" href="#" target="_blank" class="social-btn snap-btn hidden">👻 سناب شات</a>
+        <a id="tiktokLink" href="#" target="_blank" class="social-btn tiktok-btn hidden">🎵 تيك توك</a>
+        <a id="whatsappFooterLink" href="#" target="_blank" class="social-btn wa-btn hidden">💬 تواصل واتساب</a>
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast hidden">تمت الإضافة للسلة</div>
 
   <script type="module" src="app.js"></script>
 </body>
